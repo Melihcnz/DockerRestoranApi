@@ -1,0 +1,900 @@
+{
+	"info": {
+		"_postman_id": "restaurant-mgmt-api-updated",
+		"name": "Restaurant Management API - Updated",
+		"description": "Complete Restaurant Management System API Collection with Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"version": {
+			"major": 1,
+			"minor": 0,
+			"patch": 0
+		}
+	},
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has required fields', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData.data).to.have.property('token');",
+									"    pm.expect(jsonData.data).to.have.property('user');",
+									"});",
+									"",
+									"pm.test('Save auth token', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data.token) {",
+									"        pm.collectionVariables.set('auth_token', jsonData.data.token);",
+									"        console.log('Token saved: ' + jsonData.data.token);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Get Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Profile data exists', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "profile"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🏠 Tables Management",
+			"item": [
+				{
+					"name": "Get All Tables",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Tables array exists', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/tables",
+							"host": ["{{base_url}}"],
+							"path": ["api", "tables"]
+						}
+					}
+				},
+				{
+					"name": "Create Table",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Table created successfully', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table_number\": \"T001\",\n  \"capacity\": 4,\n  \"status\": \"available\",\n  \"location\": \"Ana Salon\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/tables",
+							"host": ["{{base_url}}"],
+							"path": ["api", "tables"]
+						}
+					}
+				},
+				{
+					"name": "Update Table",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table_number\": \"T001\",\n  \"capacity\": 6,\n  \"status\": \"occupied\",\n  \"location\": \"Pencere Kenarı\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/tables/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "tables", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Table",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/tables/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "tables", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Order Management",
+			"item": [
+				{
+					"name": "Create Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Order created successfully', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"});",
+									"",
+									"pm.test('Save order ID and log order details', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data) {",
+									"        pm.collectionVariables.set('order_id', jsonData.data.id || jsonData.data.order_id);",
+									"        ",
+									"        // Log order details",
+									"        console.log('=== SIPARIŞ DETAYLARI ===');",
+									"        console.log('Sipariş Numarası: ' + (jsonData.data.order_number || 'N/A'));",
+									"        console.log('Masa Numarası: ' + (jsonData.data.table_number || 'N/A'));",
+									"        console.log('Toplam Tutar: ' + (jsonData.data.total_amount || 'N/A') + ' TL');",
+									"        console.log('Durum: ' + (jsonData.data.status || 'N/A'));",
+									"        console.log('Sipariş Tipi: ' + (jsonData.data.order_type || 'N/A'));",
+									"        console.log('========================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customer_id\": 1,\n  \"table_id\": 2,\n  \"order_type\": \"dine_in\",\n  \"items\": [\n    {\n      \"menu_item_id\": 1,\n      \"quantity\": 2,\n      \"special_requests\": \"Extra peynir\"\n    },\n    {\n      \"menu_item_id\": 2,\n      \"quantity\": 1,\n      \"special_requests\": \"Az şekerli\"\n    }\n  ],\n  \"special_instructions\": \"Hızlı servis lütfen\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders",
+							"host": ["{{base_url}}"],
+							"path": ["api", "orders"]
+						}
+					}
+				},
+				{
+					"name": "Get All Orders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Orders array exists', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/orders",
+							"host": ["{{base_url}}"],
+							"path": ["api", "orders"]
+						}
+					}
+				},
+				{
+					"name": "Get Order Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Order details exist', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/orders/{{order_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "orders", "{{order_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Daily Sales Report",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Daily sales data exists', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData.data).to.have.property('total_orders');",
+									"    pm.expect(jsonData.data).to.have.property('total_revenue');",
+									"});",
+									"",
+									"pm.test('Log daily sales report', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data) {",
+									"        console.log('=== GÜNLÜK SATIŞ RAPORU ===');",
+									"        console.log('Tarih: ' + jsonData.data.date);",
+									"        console.log('Toplam Sipariş: ' + jsonData.data.total_orders);",
+									"        console.log('Tamamlanan Sipariş: ' + jsonData.data.completed_orders);",
+									"        console.log('Toplam Gelir: ' + jsonData.data.total_revenue + ' TL');",
+									"        console.log('Ortalama Sipariş Değeri: ' + (jsonData.data.avg_order_value || 'N/A') + ' TL');",
+									"        console.log('Nakit Ödeme: ' + jsonData.data.cash_payments);",
+									"        console.log('Kart Ödeme: ' + jsonData.data.card_payments);",
+									"        console.log('===========================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/daily-sales",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "daily-sales"]
+						}
+					}
+				},
+				{
+					"name": "Daily Sales Report (Specific Date)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Log specific date sales report', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data) {",
+									"        console.log('=== BELİRLİ TARİH SATIŞ RAPORU ===');",
+									"        console.log('Tarih: ' + jsonData.data.date);",
+									"        console.log('Toplam Sipariş: ' + jsonData.data.total_orders);",
+									"        console.log('Tamamlanan Sipariş: ' + jsonData.data.completed_orders);",
+									"        console.log('Toplam Gelir: ' + jsonData.data.total_revenue + ' TL');",
+									"        console.log('===================================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/daily-sales?date=2024-01-15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "daily-sales"],
+							"query": [
+								{
+									"key": "date",
+									"value": "2024-01-15"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Monthly Sales Report",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Monthly sales data exists', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData.data).to.have.property('summary');",
+									"    pm.expect(jsonData.data).to.have.property('daily_breakdown');",
+									"});",
+									"",
+									"pm.test('Log monthly sales report', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data && jsonData.data.summary) {",
+									"        console.log('=== AYLIK SATIŞ RAPORU ===');",
+									"        console.log('Yıl: ' + jsonData.data.summary.year);",
+									"        console.log('Ay: ' + jsonData.data.summary.month);",
+									"        console.log('Toplam Sipariş: ' + jsonData.data.summary.total_orders);",
+									"        console.log('Toplam Gelir: ' + jsonData.data.summary.total_revenue + ' TL');",
+									"        console.log('Ortalama Sipariş Değeri: ' + (jsonData.data.summary.avg_order_value || 'N/A') + ' TL');",
+									"        console.log('Günlük Detay Sayısı: ' + jsonData.data.daily_breakdown.length);",
+									"        console.log('==========================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/monthly-sales",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "monthly-sales"]
+						}
+					}
+				},
+				{
+					"name": "Monthly Sales Report (Specific Month)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Log specific month sales report', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data && jsonData.data.summary) {",
+									"        console.log('=== BELİRLİ AY SATIŞ RAPORU ===');",
+									"        console.log('Yıl: ' + jsonData.data.summary.year);",
+									"        console.log('Ay: ' + jsonData.data.summary.month);",
+									"        console.log('Toplam Sipariş: ' + jsonData.data.summary.total_orders);",
+									"        console.log('Toplam Gelir: ' + jsonData.data.summary.total_revenue + ' TL');",
+									"        console.log('===============================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/monthly-sales?year=2024&month=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "monthly-sales"],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Popular Items Report",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Popular items data exists', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('Log popular items report', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data) {",
+									"        console.log('=== POPÜLER ÜRÜNLER RAPORU ===');",
+									"        console.log('Toplam Ürün Sayısı: ' + jsonData.data.length);",
+									"        jsonData.data.forEach((item, index) => {",
+									"            console.log((index + 1) + '. ' + item.name + ' - ' + item.total_sold + ' adet - ' + item.total_revenue + ' TL');",
+									"        });",
+									"        console.log('==============================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/popular-items",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "popular-items"]
+						}
+					}
+				},
+				{
+					"name": "Popular Items Report (Date Range)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Log date range popular items', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data) {",
+									"        console.log('=== TARİH ARALIĞI POPÜLER ÜRÜNLER ===');",
+									"        console.log('Tarih Aralığı: 2024-01-01 - 2024-01-31');",
+									"        console.log('Toplam Ürün Sayısı: ' + jsonData.data.length);",
+									"        console.log('====================================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/popular-items?date_from=2024-01-01&date_to=2024-01-31&limit=5",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "popular-items"],
+							"query": [
+								{
+									"key": "date_from",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "date_to",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Customer Analytics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Customer analytics data exists', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData.data).to.have.property('summary');",
+									"    pm.expect(jsonData.data).to.have.property('top_customers');",
+									"});",
+									"",
+									"pm.test('Log customer analytics', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data && jsonData.data.summary) {",
+									"        console.log('=== MÜŞTERİ ANALİTİKLERİ ===');",
+									"        console.log('Toplam Müşteri: ' + jsonData.data.summary.total_customers);",
+									"        console.log('Bu Ay Yeni Müşteri: ' + jsonData.data.summary.new_customers_this_month);",
+									"        console.log('Ortalama Müşteri Değeri: ' + jsonData.data.summary.average_customer_value + ' TL');",
+									"        console.log('VIP Müşteri: ' + jsonData.data.summary.vip_customers);",
+									"        console.log('En İyi Müşteri Sayısı: ' + jsonData.data.top_customers.length);",
+									"        console.log('============================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/customer-analytics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "customer-analytics"]
+						}
+					}
+				},
+				{
+					"name": "Payment Methods Report",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Payment methods data exists', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('Log payment methods report', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data) {",
+									"        console.log('=== ÖDEME YÖNTEMLERİ RAPORU ===');",
+									"        console.log('Toplam Ödeme Türü: ' + jsonData.data.length);",
+									"        jsonData.data.forEach((method, index) => {",
+									"            console.log((index + 1) + '. ' + method.payment_method + ' - ' + method.transaction_count + ' işlem - ' + method.total_amount + ' TL');",
+									"        });",
+									"        console.log('===============================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/payment-methods",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "payment-methods"]
+						}
+					}
+				},
+				{
+					"name": "Payment Methods Report (Date Range)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Log date range payment methods', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data) {",
+									"        console.log('=== TARİH ARALIĞI ÖDEME YÖNTEMLERİ ===');",
+									"        console.log('Tarih Aralığı: 2024-01-01 - 2024-01-31');",
+									"        console.log('Toplam Ödeme Türü: ' + jsonData.data.length);",
+									"        console.log('====================================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/payment-methods?date_from=2024-01-01&date_to=2024-01-31",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "payment-methods"],
+							"query": [
+								{
+									"key": "date_from",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "date_to",
+									"value": "2024-01-31"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Table Utilization Report",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Table utilization data exists', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('Log table utilization report', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data) {",
+									"        console.log('=== MASA KULLANIM RAPORU ===');",
+									"        console.log('Toplam Masa Sayısı: ' + jsonData.data.length);",
+									"        jsonData.data.forEach((table, index) => {",
+									"            console.log('Masa ' + table.table_number + ' - ' + table.orders_count + ' sipariş - ' + table.revenue + ' TL');",
+									"        });",
+									"        console.log('============================');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/table-utilization",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "table-utilization"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "order_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+} 

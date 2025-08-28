@@ -1,0 +1,73 @@
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: restaurant_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: restaurant_db
+      MYSQL_ROOT_PASSWORD: restaurant123
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./restaurant_db.sql:/docker-entrypoint-initdb.d/restaurant_db.sql
+    networks:
+      - restaurant_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prestaurant123"]
+      timeout: 5s
+      retries: 10
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: restaurant_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: restaurant123
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - restaurant_network
+
+  # Backend API
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: restaurant_backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: restaurant123
+      DB_NAME: restaurant_db
+      JWT_SECRET: your_jwt_secret_here_change_this
+      PORT: 5000
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX_REQUESTS: 1000
+    ports:
+      - "5000:5000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - restaurant_network
+
+volumes:
+  mysql_data:
+
+networks:
+  restaurant_network:
+    driver: bridge
