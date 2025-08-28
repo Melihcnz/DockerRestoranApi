@@ -16,8 +16,14 @@ const createUploadDirs = () => {
   ];
 
   dirs.forEach(dir => {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true, mode: 0o755 });
+        console.log(`Upload directory created: ${dir}`);
+      }
+    } catch (error) {
+      console.error(`Error creating upload directory ${dir}:`, error.message);
+      // Docker'da zaten klasörler oluşturulmuş olabilir, devam et
     }
   });
 };

@@ -61,12 +61,13 @@ services:
       mysql:
         condition: service_healthy
     volumes:
-      - ./uploads:/app/uploads
+      - uploads_data:/app/uploads
     networks:
       - restaurant_network
 
 volumes:
   mysql_data:
+  uploads_data:
 
 networks:
   restaurant_network:
